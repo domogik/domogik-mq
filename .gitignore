@@ -1,0 +1,23 @@
+syntax: glob
+.svn
+*.orig
+*.rej
+.DS_Store
+:2e*
+.Apple*
+.AppleDouble/
+.AppleDesktop/
+.AppleDB/
+*.pyc
+*.bak
+*.pyoeggs/*
+eggs
+.installed.cfg
+src/Domogik_MQ.egg-info/
+develop-eggs/
+dist/ 
+build/
+_build/*
+install.log
+*.swp
+pipinstall.log
