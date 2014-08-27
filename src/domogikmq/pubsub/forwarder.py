@@ -35,16 +35,15 @@ Implements
 """
 
 import zmq
+import daemon
+import sys
 from domogikmq.configloader import Loader
 from domogikmq import logger
-from domogikmq.daemon.daemon import DaemonContext
 
 def main():
     """
        Main loop for the forwarder
     """
-    ctx = DaemonContext()
-    ctx.open()
 
     cfg = Loader('mq').load()
     config = dict(cfg[1])
@@ -85,4 +84,8 @@ def main():
         log.info("Forwarder stopped")
 
 if __name__ == "__main__":
-    main()
+    with daemon.DaemonContext(
+        stderr=sys.stderr,
+        stdin=sys.stdin,
+        stdout=sys.stdout):
+        main()

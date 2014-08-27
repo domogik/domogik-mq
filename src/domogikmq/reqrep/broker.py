@@ -23,13 +23,14 @@ __email__ = 'gst-py@a-nugget.de'
 
 
 import zmq
+import daemon
+import sys
 from zmq.eventloop.zmqstream import ZMQStream
 from zmq.eventloop.ioloop import PeriodicCallback, IOLoop
 import traceback
 
 from domogikmq.common import split_address
 from domogikmq.configloader import Loader
-from domogikmq.daemon.daemon import DaemonContext
 from domogikmq import logger
 from domogikmq.socket import ZmqSocket
 
@@ -597,18 +598,19 @@ class ServiceQueue(object):
 #
 ###
 def main():
-    cfg = Loader('mq')
-    my_conf = cfg.load()
-    config = dict(my_conf[1])
+    with daemon.DaemonContext(
+        stderr=sys.stderr,
+        stdin=sys.stdin,
+        stdout=sys.stdout):
+        cfg = Loader('mq')
+        my_conf = cfg.load()
+        config = dict(my_conf[1])
 
-    ctx = DaemonContext()
-    ctx.open()
-
-    context = zmq.Context()
-    print(("tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])))
-    broker = MDPBroker(context, "tcp://{0}:{1}".format(config['ip'], config['req_rep_port']))
-    IOLoop.instance().start()
-    broker.shutdown()
+        context = zmq.Context()
+        print(("tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])))
+        broker = MDPBroker(context, "tcp://{0}:{1}".format(config['ip'], config['req_rep_port']))
+        IOLoop.instance().start()
+        broker.shutdown()
 
 if __name__ == '__main__':
     main()
