@@ -1,0 +1,17 @@
+Metadata-Version: 1.1
+Name: Domogik-MQ
+Version: 0.4.0
+Summary: MQ module for Domogik
+Home-page: http://www.domogik.org/
+Author: Domogik team
+Author-email: domogik-general@lists.labs.libre-entreprise.org
+License: GPL v3
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Topic :: Home Automation
+Classifier: Environment :: No Input/Output (Daemon)
+Classifier: Programming Language :: Python
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Natural Language :: English

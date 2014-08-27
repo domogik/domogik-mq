@@ -1,0 +1,3 @@
+setuptools
+simplejson >= 1.9.2
+pyzmq >= 2.2.0

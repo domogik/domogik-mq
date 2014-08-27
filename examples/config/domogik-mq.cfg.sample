@@ -1,0 +1,20 @@
+# This config file is used by some Domogik MQ module.
+# You must tune it and then put it in /etc/domogik/domogik-mq.cfg
+
+[mq]
+# The directory in which log files will be created
+# It must exists and be writable by the Domogik user
+# Default : /var/log/domogik/
+log_dir_path = /var/log/domogik/
+
+# This directory will contains pid files of started plugins.
+# They are used to stop the process by killing it
+pid_dir_path = /var/run/domogik/
+
+# Debug levels are debug, info, warning, error, critical
+log_level = debug
+
+ip = 127.0.0.1
+req_rep_port = 40410
+pub_port = 40411
+sub_port = 40412

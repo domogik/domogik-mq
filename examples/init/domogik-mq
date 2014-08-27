@@ -1,0 +1,134 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:          domogik-mq
+# Required-Start:    $local_fs $network
+# Required-Stop:     $local_fs $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start Domogik MQ daemons
+### END INIT INFO
+
+#This file is part of B{Domogik} project (U{http://www.domogik.org}).
+#
+#License
+#=======
+#
+#B{Domogik} is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, either version 3 of the License, or
+#(at your option) any later version.
+#
+#B{Domogik} is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with Domogik. If not, see U{http://www.gnu.org/licenses}.
+
+# source application-specific settings
+CUSTOM_PATH=""
+MQ_BROKER=dmg_broker
+MQ_FORWARDER=dmg_forwarder
+DIETIME=2
+STARTTIME=5
+LOGDIR="/var/log/domogik"
+
+[ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
+[ -f /etc/default/domogik ] && . /etc/default/domogik
+
+PATH=${PATH}:${CUSTOM_PATH}:
+if [ ${UID} != 0 ];then
+    echo "Must be run with root privileges";
+    exit 1;
+fi
+
+function start {
+    echo -n " * Starting 0MQ broker ..."
+    /bin/su - ${DOMOGIK_USER} -c "$(which ${MQ_BROKER}) >/dev/null"
+    if [ $? -gt 0 ]; then
+        echo " An error occured during 0MQ broker startup."
+        exit 1
+    fi
+    echo " Done."
+    echo -n " * Starting 0MQ forwarder ..."
+    /bin/su - ${DOMOGIK_USER} -c "$(which ${MQ_FORWARDER}) >/dev/null"
+    if [ $? -gt 0 ]; then
+        echo " An error occured during 0MQ forwarder startup."
+        exit 1
+    fi
+    echo " Done."
+}
+
+function status {
+    set +e
+    RUNNING=$(/usr/bin/pgrep -c ${MQ_BROKER})
+    set -e
+    if [ ! -z ${RUNNING} ] && [ ${RUNNING} -gt 0 ] ; then
+        echo " * ${MQ_BROKER} is running"
+    else
+        echo " * ${MQ_BROKER} is not running"
+    fi
+    set +e
+    RUNNING=$(/usr/bin/pgrep -c ${MQ_FORWARDER})
+    set -e
+    if [ ! -z ${RUNNING} ] && [ ${RUNNING} -gt 0 ] ; then
+        echo " * ${MQ_FORWARDER} is running"
+    else
+        echo " * ${MQ_FORWARDER} is not running"
+    fi
+
+}
+
+function stop {
+    echo -n " * Stopping 0MQ broker..."
+    for pid in `ps ax | grep "${MQ_BROKER}" | grep -v grep | awk '{print $1}'`; do
+        kill -15 $pid 2>/dev/null 1>&2
+        sleep ${DIETIME}
+        kill -9 $pid 2>/dev/null 1>&2
+    done
+    echo " Done."
+    echo -n " * Stopping 0MQ forwarder..."
+    for pid in `ps ax | grep "${MQ_FORWARDER}" | grep -v grep | awk '{print $1}'`; do
+        kill -15 $pid 2>/dev/null 1>&2
+        sleep ${DIETIME}
+        kill -9 $pid 2>/dev/null 1>&2
+    done
+    echo " Done."
+
+}
+
+# Check if the directory for lock exists
+function check_dir {
+    [ ! -d ${LOGDIR} ] && mkdir ${LOGDIR}
+    chown ${DOMOGIK_USER}: ${LOGDIR}
+}
+
+case "$1" in
+    start)
+        check_dir
+#        [ -f ${PIDFILE} ] && echo "Domogik seems to be running or is crashed. Please use stop to kill all remainings tasks." && exit 0
+        start
+#        sleep ${STARTTIME}
+#        sleep ${STARTTIME}
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+#        check_lock_dir
+        stop
+        sleep ${DIETIME}
+        sleep ${DIETIME}
+        start
+#        sleep ${STARTTIME}
+        ;;
+    status)
+        status
+        ;;
+    *)
+    echo "usage: $0 {start|stop|restart|status}"
+    echo "More help : $0 command help"
+esac
+exit 0

@@ -1,0 +1,4 @@
+# This file defines config parameters for domogik MQ module
+
+#Start domogik MQ daemon under this user
+DOMOGIK_USER=domogik
