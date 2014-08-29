@@ -222,6 +222,9 @@ def install():
     parser.add_argument('--no-create-user', dest='user_creation', \
                    action="store_false", \
                    default=True, help='Don\'t create a user')
+    parser.add_argument('--daemon', dest='install_daemon', \
+                    action="store_true", \
+                    default=True, help='Install the daemon')
     parser.add_argument("--user",
                    help="Set the domogik user")
 
@@ -268,7 +271,13 @@ def install():
             create_user(user)
 
         # Ask Master or Client install
-        master = ask_master_install()
+        if args.command_line:
+            if args.install_daemon:
+                master = True
+            else:
+                master = False
+        else:
+            master = ask_master_install()
 
         # Copy files
         copy_files(user, master)
