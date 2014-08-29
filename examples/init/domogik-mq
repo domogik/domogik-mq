@@ -35,8 +35,8 @@ DIETIME=2
 STARTTIME=5
 LOGDIR="/var/log/domogik"
 
-[ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
-[ -f /etc/default/domogik ] && . /etc/default/domogik
+[ -f /etc/conf.d/domogik-mq ] && . /etc/conf.d/domogik-mq
+[ -f /etc/default/domogik-mq ] && . /etc/default/domogik-mq
 
 PATH=${PATH}:${CUSTOM_PATH}:
 if [ ${UID} != 0 ];then
