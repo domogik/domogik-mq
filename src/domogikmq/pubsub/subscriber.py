@@ -106,6 +106,9 @@ class MQAsyncSub():
         """
         mid = msg[0]
         mid = mid.split('.')
+        if len(mid) < 3:
+            # this sometimes happens, no idea why, probebly a bug in pyzmq
+            return
         # delete msg version
         del mid[-1]
         # delete timestamp
