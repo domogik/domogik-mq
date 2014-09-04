@@ -46,6 +46,7 @@ fi
 
 function start {
     echo -n " * Starting 0MQ broker ..."
+    echo "/bin/su - ${DOMOGIK_USER} -c \"$(which ${MQ_BROKER}) >/dev/null\""
     /bin/su - ${DOMOGIK_USER} -c "$(which ${MQ_BROKER}) >/dev/null"
     if [ $? -gt 0 ]; then
         echo " An error occured during 0MQ broker startup."
@@ -53,6 +54,7 @@ function start {
     fi
     echo " Done."
     echo -n " * Starting 0MQ forwarder ..."
+    echo "/bin/su - ${DOMOGIK_USER} -c \"$(which ${MQ_FORWARDER}) >/dev/null\""
     /bin/su - ${DOMOGIK_USER} -c "$(which ${MQ_FORWARDER}) >/dev/null"
     if [ $? -gt 0 ]; then
         echo " An error occured during 0MQ forwarder startup."
