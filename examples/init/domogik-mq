@@ -53,8 +53,8 @@ function start {
     fi
     echo " Done."
     echo -n " * Starting 0MQ forwarder ..."
-    /bin/su - ${DOMOGIK_USER} -c "$(which ${MQ_FORWARDER}) >/dev/null"
-    echo "AFTER SU"
+    #original command# /bin/su - ${DOMOGIK_USER} -c "$(which ${MQ_FORWARDER}) >/dev/null"
+    nohup /bin/su - ${DOMOGIK_USER} -c "$(which ${MQ_FORWARDER}) >/dev/null " &
     if [ $? -gt 0 ]; then
         echo " An error occured during 0MQ forwarder startup."
         exit 1
