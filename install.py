@@ -224,7 +224,7 @@ def install():
                    default=True, help='Don\'t create a user')
     parser.add_argument('--daemon', dest='install_daemon', \
                     action="store_true", \
-                    default=True, help='Install the daemon')
+                    default=True, help='Install the daemon (master mode)')
     parser.add_argument("--user",
                    help="Set the domogik user")
     parser.add_argument("--user-shell", dest="user_shell",
