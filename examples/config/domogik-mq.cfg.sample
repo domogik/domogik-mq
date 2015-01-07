@@ -2,6 +2,8 @@
 # You must tune it and then put it in /etc/domogik/domogik-mq.cfg
 
 [mq]
+# Is this a master install or not
+is_master = true
 # The directory in which log files will be created
 # It must exists and be writable by the Domogik user
 # Default : /var/log/domogik/

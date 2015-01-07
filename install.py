@@ -154,7 +154,7 @@ def create_user(d_user, d_shell = "/bin/sh"):
 
 def is_domogik_advanced(advanced_mode, sect, key):
     advanced_keys = {
-        'mq': ['req_rep_port', 'pub_port', 'sub_port'],
+        'mq': ['req_rep_port', 'pub_port', 'sub_port', 'install_type'],
     }
     if advanced_mode:
         return True
@@ -167,7 +167,7 @@ def is_domogik_advanced(advanced_mode, sect, key):
             else:
                 return False
 
-def write_domogik_configfile(advanced_mode):
+def write_domogik_configfile(advanced_mode, master):
     # read the sample config file
     newvalues = False
     config = ConfigParser.RawConfigParser()
@@ -175,7 +175,9 @@ def write_domogik_configfile(advanced_mode):
     for sect in config.sections():
         info("Starting on section {0}".format(sect))
         for item in config.items(sect):
-            if is_domogik_advanced(advanced_mode, sect, item[0]):
+            if item[0] == 'is_master':
+                config.set(sect, 'is_master', master)
+            elif is_domogik_advanced(advanced_mode, sect, item[0]):
                 print("Key {0} [{1}]: ".format(item[0], item[1])),
                 new_value = sys.stdin.readline().rstrip('\n')
                 if new_value != item[1] and new_value != '':
@@ -187,7 +189,7 @@ def write_domogik_configfile(advanced_mode):
         ok("Writing the config file")
         config.write(configfile)
 
-def write_domogik_configfile_from_command_line(args):
+def write_domogik_configfile_from_command_line(args, master):
     # read the sample config file
     newvalues = False
     config = ConfigParser.RawConfigParser()
@@ -195,13 +197,16 @@ def write_domogik_configfile_from_command_line(args):
     for sect in config.sections():
         info("Starting on section {0}".format(sect))
         for item in config.items(sect):
-            new_value = eval("args.{0}_{1}".format(sect, item[0]))
-            if new_value != item[1] and new_value != '' and new_value != None:
-                # need to write it to config file
-                print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
-                config.set(sect, item[0], new_value)
-                newvalues = True
-            debug("Value {0} in domogik-mq.cfg set to {1}".format(item[0], new_value))
+            if item[0] == 'is_master':
+                config.set(sect, 'is_master', master)
+            else:
+                new_value = eval("args.{0}_{1}".format(sect, item[0]))
+                if new_value != item[1] and new_value != '' and new_value != None:
+                    # need to write it to config file
+                    print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
+                    config.set(sect, item[0], new_value)
+                    newvalues = True
+                debug("Value {0} in domogik-mq.cfg set to {1}".format(item[0], new_value))
     # write the config file
     with open('/etc/domogik/domogik-mq.cfg', 'wb') as configfile:
         ok("Writing the config file")
@@ -299,12 +304,12 @@ def install():
         # write config file
         if args.command_line:
             info("Update the config file : /etc/domogik/domogik-mq.cfg")
-            write_domogik_configfile_from_command_line(args)
+            write_domogik_configfile_from_command_line(args, master)
 
         else:
             if not args.config and needupdate():
                 info("Update the config file : /etc/domogik/domogik-mq.cfg")
-                write_domogik_configfile(False)
+                write_domogik_configfile(False, master)
     except:
         import traceback
         print "========= TRACEBACK ============="
