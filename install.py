@@ -67,7 +67,7 @@ def build_file_list(user, master):
         fail("Can't find directory where i can copy system wide config")
         exit(0)
 
-    if master:
+    """if master:
         if os.path.exists('/etc/init.d'):
             debug("Init script path is /etc/init.d")
             d_files.append(('/etc/init.d/', [user, 0755], \
@@ -78,7 +78,7 @@ def build_file_list(user, master):
                     ['examples/init/domogik-mq']))
         else:
             warning("Can't find firectory for init script: Require manual install")
-
+    """
     return d_files
 
 
