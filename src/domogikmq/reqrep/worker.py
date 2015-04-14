@@ -39,6 +39,9 @@ from domogikmq.common import split_address
 from domogikmq.message import MQMessage
 from domogikmq.socket import ZmqSocket
 
+# Debug mode to activate to get stdout informations
+DEBUG = False
+
 class MQRep(object):
 
     """Class for the MDP worker side.
@@ -61,6 +64,8 @@ class MQRep(object):
         context is the zmq context to create the socket from.
         service is a byte-string with the service name.
         """
+        if DEBUG:
+            print("MQRep > __init__")
         cfg = Loader('mq').load()
         config = dict(cfg[1])
         self.endpoint = "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])
@@ -72,17 +77,27 @@ class MQRep(object):
         self.ticker = None
         self._delayed_cb = None
         self._create_stream()
+
+        ### patch fritz
+        self._reconnect_in_progress = False
+        ### end patch fritz
         return
 
     def _create_stream(self):
         """Helper to create the socket and the stream.
         """
+        if DEBUG:
+            print("MQRep > _create_stream")
         socket = ZmqSocket(self.context, zmq.DEALER)
         ioloop = IOLoop.instance()
         self.stream = ZMQStream(socket, ioloop)
         self.stream.on_recv(self._on_mpd_message)
         self.stream.socket.setsockopt(zmq.LINGER, 0)
         self.stream.connect(self.endpoint)
+        if self.ticker != None:
+            if DEBUG:
+                print("MQRep > _create_stream - stop ticker")
+            self.ticker.stop()
         self.ticker = PeriodicCallback(self._tick, self.HB_INTERVAL)
         self._send_ready()
         self.ticker.start()
@@ -91,24 +106,32 @@ class MQRep(object):
     def _send_ready(self):
         """Helper method to prepare and send the workers READY message.
         """
+        if DEBUG:
+            print("MQREP > _send_ready")
         ready_msg = [ b'', self._proto_version, b'\x01', self.service ]
         self.stream.send_multipart(ready_msg)
         self.curr_liveness = self.HB_LIVENESS
+        if DEBUG:
+            print("MQREP > _send_ready > curr_liveness <= {0}".format(self.HB_LIVENESS))
         return
 
     def _tick(self):
         """Method called every HB_INTERVAL milliseconds.
         """
+        if DEBUG:
+            print("MQREP > _tick")
         self.curr_liveness -= 1
-        #print(('{0} tick - {1}'.format(time.time(), self.curr_liveness)))
+        if DEBUG:
+            print('MQREP > _tick - {0} tick = {1}'.format(time.time(), self.curr_liveness))
         self.send_hb()
         if self.curr_liveness >= 0:
             return
-        #print(('{0} lost connection'.format(time.time())))
+        if DEBUG:
+            print('MQREP > _tick - {0} lost connection'.format(time.time()))
         # ouch, connection seems to be dead
         self.shutdown()
         # try to recreate it
-        self._delayed_cb = DelayedCallback(self._create_stream, 5000)
+        self._delayed_cb = DelayedCallback(self._create_stream, self.HB_INTERVAL)
         self._delayed_cb.start()
         return
 
@@ -159,6 +182,8 @@ class MQRep(object):
 
         msg is a list w/ the message parts
         """
+        if DEBUG:
+            print("MQRep > _on_mpd_message : {0} - {1}".format(time.strftime("%H:%M:%S"), msg))
         # 1st part is empty
         msg.pop(0)
         # 2nd part is protocol version
@@ -170,9 +195,15 @@ class MQRep(object):
         # any message resets the liveness counter
         self.need_handshake = False
         self.curr_liveness = self.HB_LIVENESS
+        if DEBUG:
+            print("MQREP > _on_mpd_message > curr_liveness <= {0}".format(self.HB_LIVENESS))
         if msg_type == b'\x05': # disconnect
+            if DEBUG:
+                print("MQREP > _on_mpd_message > type x05 : disconnect")
             self.curr_liveness = 0 # reconnect will be triggered by hb timer
         elif msg_type == b'\x02': # request
+            if DEBUG:
+                print("MQREP > _on_mpd_message > type x02 : request")
             # remaining parts are the user message
             envelope, msg = split_address(msg)
             envelope.append(b'')
@@ -180,10 +211,19 @@ class MQRep(object):
             self.envelope = envelope
             mes = MQMessage()
             mes.set(msg)
-            self.on_mdp_request(mes)
+            #print("MQRep > before self.on_mdp_request")
+            #print(self.on_mdp_request)
+            #print(mes)
+            try:
+                self.on_mdp_request(mes)
+            except:
+                print("--- ERROR ---")
         else:
+            if DEBUG:
+                print("MQREP > _on_mpd_message > type ??? : invalid or hbeat")
             # invalid message
             # ignored
+            # if \x04, this is a hbeat message
             pass
         return
 
