@@ -91,8 +91,8 @@ class MQAsyncSub():
             for category_filter in category_filters:
                 self.s_recv.setsockopt(zmq.SUBSCRIBE, category_filter)
         ioloop = IOLoop.instance()
-        self.stream = ZMQStream(self.s_recv, ioloop)
-        self.stream.on_recv(self._on_message)
+        self.stream_asyncmq = ZMQStream(self.s_recv, ioloop)
+        self.stream_asyncmq.on_recv(self._on_message)
     
     def __del__(self):
         # Not sure this is really mandatory
