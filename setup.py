@@ -53,7 +53,7 @@ setup(
     description = 'MQ module for Domogik',
     author = 'Domogik team',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
-    install_requires=['setuptools',
+    install_requires=['setuptools', 'version',
           'pip >= 1.0',
           'simplejson >= 1.9.2',
           'python-daemon >= 1.5.5',
