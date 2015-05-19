@@ -54,25 +54,38 @@ def main():
         context = zmq.Context(1)
 
         # Socket facing emitters
-        frontend = context.socket(zmq.SUB)
+        frontend = context.socket(zmq.XSUB)
         # Forwarder subscribes to the emitter *pub* port
         sub_addr = "tcp://{0}:{1}".format(\
                    config['ip'], config['pub_port'])
         frontend.bind(sub_addr)
         log.info("Waiting for messages on {0}".format(sub_addr))
         # We want to get all messages from emitters
-        frontend.setsockopt(zmq.SUBSCRIBE, "")
+        #frontend.setsockopt(zmq.SUBSCRIBE, "")
         
         # Socket facing receivers
-        backend = context.socket(zmq.PUB)
+        backend = context.socket(zmq.XPUB)
         # Forwarder publishes to the receiver *sub* port
         pub_addr = "tcp://{0}:{1}".format(\
                    config['ip'], config['sub_port'])
         backend.bind(pub_addr)
-        log.info("Sending messages to {0}".format(pub_addr))
+        #log.info("Sending messages to {0}".format(pub_addr))
         
         log.info("Forwarding messages...")
-        zmq.device(zmq.FORWARDER, frontend, backend)
+        #zmq.device(zmq.FORWARDER, frontend, backend)
+        poller = zmq.Poller()
+        poller.register(frontend, zmq.POLLIN)
+        poller.register(backend, zmq.POLLIN)
+        while True:
+            events = dict(poller.poll(1000))
+            if frontend in events:
+                message = frontend.recv_multipart()
+                log.debug("Forwarding message: {0}".format(message[0]))
+                backend.send_multipart(message)
+            if backend in events:
+                message = backend.recv_multipart()
+                log.error("BAD direction message: {0}".format(message))
+                frontend.send_multipart(message)
     except Exception as exp:
         log.error(exp)
         log.error("Bringing down ZMQ device")
@@ -89,3 +102,24 @@ if __name__ == "__main__":
         stdin=sys.stdin,
         stdout=sys.stdout):
         main()
+
+"""
+    xpub = ctx.socket(zmq.XPUB)
+    xpub.bind(xpub_url)
+    xsub = ctx.socket(zmq.XSUB)
+    xsub.bind(xsub_url)
+
+    poller = zmq.Poller()
+    poller.register(xpub, zmq.POLLIN)
+    poller.register(xsub, zmq.POLLIN)
+    while True:
+        events = dict(poller.poll(1000))
+        if xpub in events:
+            message = xpub.recv_multipart()
+            print "[BROKER] subscription message: %r" % message[0]
+            xsub.send_multipart(message)
+        if xsub in events:
+            message = xsub.recv_multipart()
+            # print "publishing message: %r" % message
+            xpub.send_multipart(message)
+"""
