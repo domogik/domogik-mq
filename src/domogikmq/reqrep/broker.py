@@ -208,6 +208,7 @@ class MDPBroker(object):
 
         :rtype: None
         """
+        self.log.debug("WORKER REP received: from='{0}' data={1}".format(service, msg))
         to_send = rp[:]
         to_send.extend([b'', self.CLIENT_PROTO, service])
         to_send.extend(msg)
@@ -254,7 +255,6 @@ class MDPBroker(object):
 
         :rtype: None
         """
-        self.log.debug("Check for dead workers...")
         for wrep in list(self._workers.values()):
             if not wrep.is_alive():
                 self.log.info("A worker seems to be dead : wid={0} service={1}".format(wrep.id, wrep.service))
@@ -409,6 +409,7 @@ class MDPBroker(object):
         :rtype: None
         """
         service = msg.pop(0)
+        self.log.debug("Client REQ received: to='{0}' data={1}".format(service, msg))
         if service.startswith(b'mmi.'):
             self.on_mmi(rp, service, msg)
             return
@@ -477,7 +478,6 @@ class MDPBroker(object):
 
         :rtype: None
         """
-        self.log.debug("Message received: {0}".format(msg))
         rp, msg = split_address(msg)
         # dispatch on first frame after path
         t = msg.pop(0)
