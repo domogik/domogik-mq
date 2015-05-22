@@ -5,7 +5,12 @@ import os
 import pwd
 import sys
 import platform
-import ConfigParser
+try:
+    # from python3 onwards
+    import configparser
+except ImportError:
+    # python 2
+    import ConfigParser as configparser
 import argparse
 import shutil
 import logging
@@ -170,7 +175,7 @@ def is_domogik_advanced(advanced_mode, sect, key):
 def write_domogik_configfile(advanced_mode, master):
     # read the sample config file
     newvalues = False
-    config = ConfigParser.RawConfigParser()
+    config = configparser.RawConfigParser()
     config.read( ['/etc/domogik/domogik-mq.cfg.sample'] )
     for sect in config.sections():
         info("Starting on section {0}".format(sect))
@@ -192,7 +197,7 @@ def write_domogik_configfile(advanced_mode, master):
 def write_domogik_configfile_from_command_line(args, master):
     # read the sample config file
     newvalues = False
-    config = ConfigParser.RawConfigParser()
+    config = configparser.RawConfigParser()
     config.read( ['/etc/domogik/domogik-mq.cfg.sample'] )
     for sect in config.sections():
         info("Starting on section {0}".format(sect))
@@ -319,7 +324,7 @@ def install():
 
 def add_arguments_for_config_file(parser, fle):
     # read the sample config file
-    config = ConfigParser.RawConfigParser()
+    config = configparser.RawConfigParser()
     config.read( [fle] )
     for sect in config.sections():
         for item in config.items(sect):
