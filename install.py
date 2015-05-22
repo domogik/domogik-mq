@@ -54,9 +54,9 @@ logging.basicConfig(filename='install.log', level=logging.DEBUG)
 
 def build_file_list(user, master):
     d_files = [
-        ('/etc/domogik', [user, 0755], \
+        ('/etc/domogik', [user, 0o755], \
                 ['examples/config/domogik-mq.cfg.sample']),
-        ('/var/log/domogik', [user, 0755], []),
+        ('/var/log/domogik', [user, 0o755], []),
     ]
 
     if os.path.exists('/etc/default'):
@@ -70,11 +70,11 @@ def build_file_list(user, master):
     """if master:
         if os.path.exists('/etc/init.d'):
             debug("Init script path is /etc/init.d")
-            d_files.append(('/etc/init.d/', [user, 0755], \
+            d_files.append(('/etc/init.d/', [user, 0o755], \
                     ['examples/init/domogik-mq']))
         elif os.path.exists('/etc/rc.d'):
             debug("Init script path is /etc/rc.d")
-            d_files.append(('/etc/rc.d/', [user, 0755], \
+            d_files.append(('/etc/rc.d/', [user, 0o755], \
                     ['examples/init/domogik-mq']))
         else:
             warning("Can't find firectory for init script: Require manual install")
@@ -260,12 +260,12 @@ def install():
     try:
         # CHECK python version
         if sys.version_info < (2, 6):
-            print "Python version is to low, at least python 2.6 is needed"
+            print("Python version is to low, at least python 2.6 is needed")
             exit(0)
 
         # CHECK sources not in / or /root
         info("Check the sources location (not in /root/ or /")
-        print os.getcwd()
+        print(os.getcwd())
         assert os.getcwd().startswith("/root/") == False, "Domogik MQ sources must not be located in the /root/ folder"
 
         # RUN setup.py
@@ -312,9 +312,9 @@ def install():
                 write_domogik_configfile(False, master)
     except:
         import traceback
-        print "========= TRACEBACK ============="
-        print traceback.format_exc()
-        print "================================="
+        print("========= TRACEBACK =============")
+        print(traceback.format_exc())
+        print("=================================")
         fail(sys.exc_info())
 
 def add_arguments_for_config_file(parser, fle):
