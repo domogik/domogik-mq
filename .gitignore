@@ -14,6 +14,7 @@ syntax: glob
 eggs
 .installed.cfg
 src/Domogik_MQ.egg-info/
+src/Domogik_MQ.egg-info/*
 develop-eggs/
 dist/ 
 build/
