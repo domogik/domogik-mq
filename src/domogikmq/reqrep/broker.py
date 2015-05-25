@@ -292,8 +292,8 @@ class MDPBroker(object):
         ret_id = rp[0]
         # make worker available again
         try:
-	    wrep = self._workers[ret_id]
-	    service = wrep.service
+            wrep = self._workers[ret_id]
+            service = wrep.service
             wq, wr = self._services[service]
             cp, msg = split_address(msg)
             self.client_response(cp, service, msg)
@@ -366,10 +366,10 @@ class MDPBroker(object):
                     break
             self.client_response(rp, service, [ret])
         elif service == b'mmi.services':
-	    ret = []
+            ret = []
             for wr in list(self._workers.values()):
                 ret.append(wr.service)
-	    self.client_response(rp, service, [b', '.join(ret)])
+            self.client_response(rp, service, [b', '.join(ret)])
         else:
             self.client_response(rp, service, [b'501'])
         return
