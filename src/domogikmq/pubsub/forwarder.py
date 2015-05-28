@@ -116,10 +116,10 @@ if __name__ == "__main__":
         events = dict(poller.poll(1000))
         if xpub in events:
             message = xpub.recv_multipart()
-            print("[BROKER] subscription message: %r" % message[0])
+            print("[BROKER] subscription message: {0}".format(message[0]))
             xsub.send_multipart(message)
         if xsub in events:
             message = xsub.recv_multipart()
-            # print("publishing message: %r" % message)
+            # print("publishing message: {0}".format(message))
             xpub.send_multipart(message)
 """

@@ -123,7 +123,7 @@ class MDPBroker(object):
         self.log.debug("Try to register a worker : wid={0}, service={1}".format(wid, service))
         try:
             if wid in self._workers:
-                self.log.debug("Worker %s already registered" % service)
+                self.log.debug("Worker {0} already registered".format(service))
                 return
             self._workers[wid] = WorkerRep(
                     self.WORKER_PROTO, wid, service, self.main_stream)
