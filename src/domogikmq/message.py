@@ -76,5 +76,5 @@ class MQMessage():
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<MQMessage(action=%s, data='%s')>" % (self._action, self._data)
+        return "<MQMessage(action={0}, data='{1}')>".format(self._action, self._data)
 
