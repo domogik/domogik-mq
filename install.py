@@ -190,7 +190,7 @@ def write_domogik_configfile(advanced_mode, master):
                     config.set(sect, item[0], new_value)
                     newvalues = True
     # write the config file
-    with open('/etc/domogik/domogik-mq.cfg', 'wb') as configfile:
+    with open('/etc/domogik/domogik-mq.cfg', 'w') as configfile:
         ok("Writing the config file")
         config.write(configfile)
 
@@ -213,7 +213,7 @@ def write_domogik_configfile_from_command_line(args, master):
                     newvalues = True
                 debug("Value {0} in domogik-mq.cfg set to {1}".format(item[0], new_value))
     # write the config file
-    with open('/etc/domogik/domogik-mq.cfg', 'wb') as configfile:
+    with open('/etc/domogik/domogik-mq.cfg', 'w') as configfile:
         ok("Writing the config file")
         config.write(configfile)
 
