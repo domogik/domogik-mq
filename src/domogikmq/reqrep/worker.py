@@ -29,6 +29,7 @@ __email__ = 'gst-py@a-nugget.de'
 import sys
 import time
 from pprint import pprint
+import traceback
 
 import zmq
 from zmq.eventloop.zmqstream import ZMQStream
@@ -217,7 +218,7 @@ class MQRep(object):
             try:
                 self.on_mdp_request(mes)
             except:
-                print("--- ERROR ---")
+                print("ERROR {0}".format(traceback.format_exc()))
         else:
             if DEBUG:
                 print("MQREP > _on_mpd_message > type ??? : invalid or hbeat")
