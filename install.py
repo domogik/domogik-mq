@@ -223,10 +223,10 @@ def needupdate():
         print("Do you want to keep your current config files ? [Y/n]: "),
         new_value = sys.stdin.readline().rstrip('\n')
         if new_value == "y" or new_value == "Y" or new_value == '':
-            debug("keeping curent config files")
+            ok("keeping curent config files")
             return False
         else:
-            debug("NOT keeping curent config files")
+            ok("NOT keeping curent config files")
             return True
     return True
 
@@ -236,6 +236,8 @@ def update_default(user):
 
 def install():
     parser = argparse.ArgumentParser(description='Domogik MQ installation.')
+    parser.add_argument('--dist-packages', dest='dist_packages', action="store_true",
+                   default=False, help='Try to use distribution packages instead of pip packages')
     parser.add_argument('--no-setup', dest='setup', action="store_true",
                    default=False, help='Don\'t install the python packages')
     parser.add_argument('--no-test', dest='test', action="store_true",
@@ -272,6 +274,22 @@ def install():
         info("Check the sources location (not in /root/ or /")
         print(os.getcwd())
         assert os.getcwd().startswith("/root/") == False, "Domogik MQ sources must not be located in the /root/ folder"
+
+        if args.dist_packages:
+            dist_packages_install_script = ''
+            #platform.dist() and platform.linux_distribution() 
+            #doesn't works with ubuntu/debian, both say debian.
+            #So I not found pettiest test :(
+            if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
+                dist_packages_install_script = './debian_packages_install.sh'
+            elif os.system(' bash -c \'[ "`lsb_release -si`" == "Ubuntu" ]\'') == 0:
+                dist_packages_install_script = './debian_packages_install.sh'
+            elif os.system(' bash -c \'[ "`lsb_release -si`" == "Raspbian" ]\'') == 0:
+                dist_packages_install_script = './debian_packages_install.sh'
+            if dist_packages_install_script == '' :
+                raise OSError("The option --dist-packages is not implemented on this distribution. \nPlease install the packages manually.\n When packages have been installed, you can re reun the installation script without the --dist-packages option.")
+            if os.system(dist_packages_install_script) != 0:
+                raise OSError("Cannot install packages correctly script '%s'" % dist_packages_install_script)
 
         # RUN setup.py
         if not args.setup:
@@ -315,6 +333,7 @@ def install():
             if not args.config and needupdate():
                 info("Update the config file : /etc/domogik/domogik-mq.cfg")
                 write_domogik_configfile(False, master)
+        ok("Installation finished")
     except:
         import traceback
         print("========= TRACEBACK =============")
