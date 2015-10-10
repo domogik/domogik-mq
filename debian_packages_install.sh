@@ -45,6 +45,7 @@ pkg_list="\
          python-setuptools \
          python-pip \
          python-zmq \
+         python-netifaces \
          "
 
 apt-get update
