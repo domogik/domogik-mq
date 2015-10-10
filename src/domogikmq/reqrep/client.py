@@ -33,6 +33,7 @@ from zmq import select
 from domogikmq.configloader import Loader
 from domogikmq.message import MQMessage
 from domogikmq.socket import ZmqSocket
+from domogikmq.common.utils import get_ip
 
 class MQSyncReq(object):
 
@@ -59,6 +60,8 @@ class MQSyncReq(object):
         """
         cfg = Loader('mq').load()
         config = dict(cfg[1])
+        if config['ip'].strip() == "*":
+            config['ip'] = get_ip()
         endpoint = "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])
         self.socket = ZmqSocket(context, zmq.REQ)
         self.socket.connect(endpoint)         
@@ -152,7 +155,9 @@ class MqAsyncReq(object):
         """Initialize the MDPClient.
         """
         cfg = Loader('mq').load()
-        confi = dict(cfg[1])
+        config = dict(cfg[1])
+        if config['ip'].strip() == "*":
+            config['ip'] = get_ip()
         self.endpoint = "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])
         socket = ZmqSocket(context, zmq.REQ)
         ioloop = IOLoop.instance()

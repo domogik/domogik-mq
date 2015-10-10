@@ -4,6 +4,7 @@ import json
 import sys
 from time import time
 from domogikmq.configloader import Loader
+from domogikmq.common.utils import get_ip
 
 MSG_VERSION = "0_1"
 
@@ -11,6 +12,8 @@ class MQPub(object):
     def __init__(self, context, caller_id):
         cfg = Loader('mq').load()
         self.cfg_mq = dict(cfg[1])
+        if self.cfg_mq['ip'].strip() == "*":
+            self.cfg_mq['ip'] = get_ip()
         pub_addr = "tcp://{0}:{1}".format(self.cfg_mq['ip'], self.cfg_mq['pub_port'])
         self.caller_id = caller_id
         self.s_send = context.socket(zmq.PUB)

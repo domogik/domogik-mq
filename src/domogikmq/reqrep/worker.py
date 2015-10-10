@@ -36,9 +36,10 @@ from zmq.eventloop.zmqstream import ZMQStream
 from zmq.eventloop.ioloop import IOLoop, DelayedCallback, PeriodicCallback
 
 from domogikmq.configloader import Loader
-from domogikmq.common import split_address
+from domogikmq.common.utils import split_address
 from domogikmq.message import MQMessage
 from domogikmq.socket import ZmqSocket
+from domogikmq.common.utils import get_ip
 
 # Debug mode to activate to get stdout informations
 DEBUG = False
@@ -69,6 +70,8 @@ class MQRep(object):
             print("MQRep > __init__")
         cfg = Loader('mq').load()
         config = dict(cfg[1])
+        if config['ip'].strip() == "*":
+            config['ip'] = get_ip()
         self.endpoint = "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])
         self.context = context
         self.service = service
