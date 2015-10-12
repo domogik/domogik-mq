@@ -361,6 +361,10 @@ def install():
                 info("Update the config file : /etc/domogik/domogik-mq.cfg")
                 write_domogik_configfile(False, master, intf_ip)
         ok("Installation finished")
+
+        if not args.test:
+            os.system('python test_config.py')
+        print("\n\n")
     except:
         import traceback
         print("========= TRACEBACK =============")
