@@ -182,12 +182,6 @@ def test_user_config_file(user_home, user_entry):
 
     ok("[mq] section seems good")
 
-def test_init():
-    info("Check init.d / rc.d")
-    assert os.access("/etc/init.d/domogik-mq", os.X_OK) or os.access("/etc/rc.d/domogik-mq", os.X_OK), "/etc/init.d/domogik-mq and /etc/rc.d/domogik-mq do not \
-            exist or can't be executed.\
-            Please copy src/domogik/examples/init/domogik-mq to /etc/init.d or /etc/rc.d depending on your system, and chmod +x /etc/init.d/domogik-mq"
-    ok("/etc/init.d/domogik-mq or /etc/rc.d/domogik-mq found with good permissions")
 
 def test_version():
     info("Check python version")
@@ -202,7 +196,6 @@ def test_config():
         am_i_root()
         test_imports()
         test_config_files()
-        test_init()
         test_version()
         print("\n\n")
         ok("================================================== <==")
