@@ -52,7 +52,6 @@ import fcntl
 
 
 CONFIG_FILE = "/etc/domogik/domogik-mq.cfg"
-LOCK_FILE = "/var/lock/domogik/config-mq.lock"
 
 class Loader():
     '''
@@ -76,32 +75,11 @@ class Loader():
         Parse the config
         @return pair (main_config, plugin_config)
         '''
-        # lock the file
-        if not os.path.exists(os.path.dirname(LOCK_FILE)):
-            try:
-                # note : default creation mode : 0777
-                os.mkdir(os.path.dirname(LOCK_FILE)) 
-            except:
-                raise Exception("ConfigLoader : unable to create the directory '{0}'".format(os.path.dirname(LOCK_FILE)))
-        if not os.path.exists(LOCK_FILE):
-            try:
-                file = open(LOCK_FILE, "w")
-                file.write("")
-                file.close()
-            except:
-                raise Exception("ConfigLoader : unable to create the lock file '{0}'".format(LOCK_FILE))
-        file = open(LOCK_FILE, "r+")
-        fcntl.lockf(file, fcntl.LOCK_EX)
-
         # read config file
         self.config = configparser.ConfigParser()
         cfg_file = open(CONFIG_FILE)
         self.config.readfp(cfg_file)
         cfg_file.close()
-
-        # release the file lock
-        fcntl.lockf(file, fcntl.LOCK_UN)
-        file.close()
 
         # get 'mq' config part
         result = self.config.items('mq')
@@ -118,19 +96,3 @@ class Loader():
             result =  (domogik_part, self.config.items(self.part_name))
 
         return result
-
-    def set(self, section, key, value):
-        """ Set a key value for a section in config file and write it
-            WARNING : using this function make config fil change : 
-            - items are reordered
-            - comments are lost
-            @param section : section of config file
-            @param key : key
-            @param value : value
-        """
-        # Check load is called before this function
-        if self.config == None:
-            raise Exception("ConfigLoader : you must use load() before set() function")
-        self.config.set(section, key, value)
-        with open(CONFIG_FILE, "wb") as configfile:
-            self.config.write(configfile)
