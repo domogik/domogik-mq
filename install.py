@@ -243,7 +243,8 @@ def find_interface_ip():
     info("Trying to find an interface ip to listen on")
     try:
         import traceback
-        pkg_resources.get_distribution("domogik").activate()
+        # TODO : del
+        #pkg_resources.get_distribution("domogik").activate()
         for intf in get_interfaces():
             if intf == 'lo':
                 continue
