@@ -39,6 +39,7 @@ import daemon
 import sys
 from domogikmq.configloader import Loader
 from domogikmq import logger
+from domogikmq.common.utils import get_ip
 
 def main():
     """
@@ -56,10 +57,12 @@ def main():
         # Socket facing emitters
         frontend = context.socket(zmq.XSUB)
         # Forwarder subscribes to the emitter *pub* port
+        if config['ip'].strip() == "*":
+            config['ip'] = get_ip(log = log)
         sub_addr = "tcp://{0}:{1}".format(\
                    config['ip'], config['pub_port'])
+        log.info("Waiting for messages on {0} [BIND]".format(sub_addr))
         frontend.bind(sub_addr)
-        log.info("Waiting for messages on {0}".format(sub_addr))
         # We want to get all messages from emitters
         #frontend.setsockopt(zmq.SUBSCRIBE, "")
         
@@ -68,8 +71,8 @@ def main():
         # Forwarder publishes to the receiver *sub* port
         pub_addr = "tcp://{0}:{1}".format(\
                    config['ip'], config['sub_port'])
+        log.info("Sending messages to {0} [BIND]".format(pub_addr))
         backend.bind(pub_addr)
-        #log.info("Sending messages to {0}".format(pub_addr))
         
         log.info("Forwarding messages...")
         #zmq.device(zmq.FORWARDER, frontend, backend)

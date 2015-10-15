@@ -29,10 +29,11 @@ from zmq.eventloop.zmqstream import ZMQStream
 from zmq.eventloop.ioloop import PeriodicCallback, IOLoop
 import traceback
 
-from domogikmq.common import split_address
+from domogikmq.common.utils import split_address
 from domogikmq.configloader import Loader
 from domogikmq import logger
 from domogikmq.socket import ZmqSocket
+from domogikmq.common.utils import get_ip
 
 ###
 
@@ -84,6 +85,7 @@ class MDPBroker(object):
 
         socket = ZmqSocket(context, zmq.ROUTER)
         socket.bind(main_ep)
+        self.log.info("Using {0} [BIND]".format(main_ep))
         self.main_stream = ZMQStream(socket)
         self.main_stream.on_recv(self.on_message)
         if opt_ep:
@@ -607,6 +609,8 @@ def main():
         config = dict(my_conf[1])
 
         context = zmq.Context()
+        if config['ip'].strip() == "*":
+            config['ip'] = get_ip()
         print(("tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])))
         broker = MDPBroker(context, "tcp://{0}:{1}".format(config['ip'], config['req_rep_port']))
         IOLoop.instance().start()

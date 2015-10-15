@@ -48,13 +48,14 @@ for mod in pip.get_installed_distributions():
 
 setup(
     name = 'Domogik MQ',
-    version = '0.4.0',
+    version = '1.1',
     url = 'http://www.domogik.org/',
     description = 'MQ module for Domogik',
     author = 'Domogik team',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
     install_requires=['setuptools',
           'pip >= 1.0',
+          'netifaces',
           'simplejson >= 1.9.2',
           'python-daemon >= 1.5.5',
           'pyzmq >= 14.4.0'],

@@ -40,6 +40,7 @@ import sys
 from zmq.eventloop.zmqstream import ZMQStream
 from zmq.eventloop.ioloop import IOLoop
 from domogikmq.configloader import Loader
+from domogikmq.common.utils import get_ip
 
 MSG_VERSION = "0_1"
 
@@ -47,6 +48,8 @@ class MQSyncSub():
     def __init__(self, context, caller_id, category_filters):
         cfg = Loader('mq').load()
         self.cfg_mq = dict(cfg[1])
+        if self.cfg_mq['ip'].strip() == "*":
+            self.cfg_mq['ip'] = get_ip()
         sub_addr = "tcp://{0}:{1}".format(self.cfg_mq['ip'], self.cfg_mq['sub_port'])
         self.s_recv = context.socket(zmq.SUB)
         self.caller_id = caller_id
@@ -80,6 +83,8 @@ class MQAsyncSub():
     def __init__(self, context, caller_id, category_filters):
         cfg = Loader('mq').load()
         self.cfg_mq = dict(cfg[1])
+        if self.cfg_mq['ip'].strip() == "*":
+            self.cfg_mq['ip'] = get_ip()
         sub_addr = "tcp://{0}:{1}".format(self.cfg_mq['ip'], self.cfg_mq['sub_port'])
         self.caller_id = caller_id
         self.s_recv = context.socket(zmq.SUB)
