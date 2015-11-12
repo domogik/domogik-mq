@@ -48,7 +48,7 @@ for mod in pip.get_installed_distributions():
 
 setup(
     name = 'Domogik MQ',
-    version = '1.1',
+    version = '1.3',
     url = 'http://www.domogik.org/',
     description = 'MQ module for Domogik',
     author = 'Domogik team',

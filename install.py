@@ -134,7 +134,7 @@ def ask_user_name():
     return d_user
 
 def ask_master_install():
-    print("Install MQ as master (lib+daemon) or client (lib only) ? [M/s]: "),
+    print("Install MQ as master (lib+daemon) [M] or client (lib only) [s] ? [M/s]: "),
     new_value = sys.stdin.readline().rstrip('\n')
     if new_value == "m" or new_value == "M" or new_value == '':
         debug("Installing MQ Master")
@@ -160,7 +160,7 @@ def create_user(d_user, d_shell = "/bin/sh"):
 
 def is_domogik_advanced(advanced_mode, sect, key):
     advanced_keys = {
-        'mq': ['req_rep_port', 'pub_port', 'sub_port', 'install_type'],
+        'mq': ['log_dir_path', 'pid_dir_path', 'log_level', 'req_rep_port', 'pub_port', 'sub_port', 'install_type'],
     }
     if advanced_mode:
         return True
@@ -188,7 +188,7 @@ def write_domogik_configfile(advanced_mode, master, intf_ip):
                 config.set(sect, item[0], intf_ip)
                 debug("Value {0} in domogik-mq.cfg set to {1}".format(item[0], intf_ip))
             elif is_domogik_advanced(advanced_mode, sect, item[0]):
-                print("Key {0} [{1}]: ".format(item[0], item[1])),
+                print("- {0} [{1}]: ".format(item[0], item[1])),
                 new_value = sys.stdin.readline().rstrip('\n')
                 if new_value != item[1] and new_value != '':
                     # need to write it to config file
@@ -280,6 +280,8 @@ def install():
                    help="Set the domogik user")
     parser.add_argument("--user-shell", dest="user_shell",
                    help="Set the domogik user shell")
+    parser.add_argument('--advanced', dest='advanced_mode', action="store_true",
+                   default=False, help='Allow to configure all options in interactive mode')
 
     # generate dynamically all arguments for the various config files
     # notice that we MUST NOT have the same sections in the different files!
@@ -360,7 +362,7 @@ def install():
                 # select the correct interface
                 intf_ip = find_interface_ip()
                 info("Update the config file : /etc/domogik/domogik-mq.cfg")
-                write_domogik_configfile(False, master, intf_ip)
+                write_domogik_configfile(args.advanced_mode, master, intf_ip)
         ok("Installation finished")
 
         if not args.test:
