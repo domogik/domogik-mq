@@ -35,11 +35,13 @@ Implements
 """
 
 import zmq
-import daemon
+#import daemon
+from domogikmq.common.daemon import daemon
 import sys
 from domogikmq.configloader import Loader
 from domogikmq import logger
 from domogikmq.common.utils import get_ip
+import traceback
 
 def main():
     """
@@ -50,6 +52,9 @@ def main():
     config = dict(cfg[1])
     log = logger.Logger('mq_forwarder').get_logger()
     log.info("Starting the forwarder")
+    frontend = None
+    backend = None
+    context = None
     
     try:
         context = zmq.Context(1)
@@ -92,11 +97,14 @@ def main():
     except Exception as exp:
         log.error(exp)
         log.error("Bringing down ZMQ device")
-        raise Exception("Error with forwarder device")
+        raise Exception("Error with forwarder device : {0}".format(traceback.format_exc()))
     finally:
-        frontend.close()
-        backend.close()
-        context.term()
+        if frontend != None:
+            frontend.close()
+        if backend != None:
+            backend.close()
+        if context != None:
+            context.term()
         log.info("Forwarder stopped")
 
 if __name__ == "__main__":

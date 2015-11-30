@@ -57,7 +57,6 @@ setup(
           'pip >= 1.0',
           'netifaces',
           'simplejson >= 1.9.2',
-          'python-daemon >= 1.5.5',
           'pyzmq >= 14.4.0'],
     zip_safe = False,
     license = 'GPL v3',

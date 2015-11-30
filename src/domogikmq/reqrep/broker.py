@@ -23,7 +23,8 @@ __email__ = 'gst-py@a-nugget.de'
 
 
 import zmq
-import daemon
+#import daemon
+from domogikmq.common.daemon import daemon
 import sys
 from zmq.eventloop.zmqstream import ZMQStream
 from zmq.eventloop.ioloop import PeriodicCallback, IOLoop
