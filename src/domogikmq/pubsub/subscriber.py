@@ -109,6 +109,9 @@ class MQAsyncSub():
         
         :param: msg = the message received
         """
+        if len(msg) < 2:
+            # this sometimes happens, no idea why, probebly a bug in pyzmq
+            return
         mid = msg[0]
         mid = mid.split('.')
         if len(mid) < 3:
