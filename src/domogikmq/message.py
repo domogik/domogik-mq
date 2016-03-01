@@ -72,7 +72,7 @@ class MQMessage():
             input a message list and decompile
         """
         self._action = stack.pop(0)
-        self._data = json.loads(stack.pop(0))
+        self._data = json.loads(stack.pop(0).decode())
 
     def __repr__(self):
         """Return an internal representation of the class"""

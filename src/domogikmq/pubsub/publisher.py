@@ -30,6 +30,6 @@ class MQPub(object):
 
         """
         msg_id = "{0}.{1}.{2}".format(category, str(time()).replace('.','_'), MSG_VERSION)
-        self.s_send.send_multipart([msg_id,json.dumps(content) ] )
+        self.s_send.send_multipart([str.encode(msg_id),str.encode(json.dumps(content)) ] )
         #self.s_send.send( json.dumps(content) )
 

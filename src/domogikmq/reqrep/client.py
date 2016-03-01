@@ -86,18 +86,25 @@ class MQSyncReq(object):
     def rawrequest(self, service, msg, timeout=None):
         if not timeout or timeout < 0.0:
             timeout = None
-	if type(msg) in (bytes, str):
+        if type(msg) is list:
+            b = []
+            for m in msg:
+                b.append(str.encode(m))
+            msg = b
+        elif type(msg) is bytes:
             msg = [msg]
-	to_send = [self._proto_version, service]
-	to_send.extend(msg)
-	self.socket.send_multipart(to_send)
-	ret = None
+        elif type(msg) is str:
+            msg = [str.encode(msg)]
+        to_send = [self._proto_version, str.encode(service)]
+        to_send.extend(msg)
+        self.socket.send_multipart(to_send)
+        ret = None
         rlist, _, _ = select([self.socket], [], [], timeout)
         if rlist and rlist[0] == self.socket:
             ret = self.socket.recv_multipart()
             ret.pop(0) # remove service from reply
             ret.pop(0)
-	return ret
+        return ret
 
     def request(self, service, msg, timeout=None):
         """Send the given message.
@@ -109,10 +116,10 @@ class MQSyncReq(object):
         
         :rtype : message parts
         """
-	ret = self.rawrequest( service, msg, timeout)
-	msg = None
-	if ret:
-	    msg = MQMessage()
+        ret = self.rawrequest( service, msg, timeout)
+        msg = None
+        if ret:
+            msg = MQMessage()
             msg.set(ret)
         return msg
 
