@@ -123,9 +123,8 @@ class MQAsyncSub():
         del mid[-1]
         # build up the id again
         mid = '.'.join(mid)
-
-	try:
-	    jsons = json.loads(msg[1])
+        try:
+            jsons = json.loads(msg[1])
             self.on_message(mid, jsons)
         except ValueError as e:
             pass
