@@ -207,8 +207,15 @@ class MqAsyncReq(object):
         """
         if not self.can_send:
             raise InvalidStateError()
-        if type(msg) in (bytes, str):
+        if type(msg) is list:
+            b = []
+            for m in msg:
+                b.append(str.encode(m))
+            msg = b
+        elif type(msg) is bytes:
             msg = [msg]
+        elif type(msg) is str:
+            msg = [str.encode(msg)]
         # prepare full message
         to_send = self._proto_prefix[:]
         to_send.extend(msg)

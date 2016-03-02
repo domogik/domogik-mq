@@ -91,10 +91,10 @@ class MQAsyncSub():
         self.s_recv.connect(sub_addr)
 
         if len(category_filters) == 0:
-            self.s_recv.setsockopt(zmq.SUBSCRIBE, '')
+            self.s_recv.setsockopt_string(zmq.SUBSCRIBE, '')
         else:
             for category_filter in category_filters:
-                self.s_recv.setsockopt(zmq.SUBSCRIBE, category_filter)
+                self.s_recv.setsockopt_string(zmq.SUBSCRIBE, category_filter)
         ioloop = IOLoop.instance()
         self.stream_asyncmq = ZMQStream(self.s_recv, ioloop)
         self.stream_asyncmq.on_recv(self._on_message)
@@ -112,7 +112,7 @@ class MQAsyncSub():
         if len(msg) < 2:
             # this sometimes happens, no idea why, probebly a bug in pyzmq
             return
-        mid = msg[0]
+        mid = msg[0].decode()
         mid = mid.split('.')
         if len(mid) < 3:
             # this sometimes happens, no idea why, probebly a bug in pyzmq
@@ -124,7 +124,7 @@ class MQAsyncSub():
         # build up the id again
         mid = '.'.join(mid)
         try:
-            jsons = json.loads(msg[1])
+            jsons = json.loads(msg[1].decode())
             self.on_message(mid, jsons)
         except ValueError as e:
             pass

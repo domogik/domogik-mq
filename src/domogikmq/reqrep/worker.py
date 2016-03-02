@@ -74,7 +74,7 @@ class MQRep(object):
             config['ip'] = get_ip()
         self.endpoint = "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])
         self.context = context
-        self.service = service
+        self.service = service.encode()
         self.stream = None
         self._tmo = None
         self.need_handshake = True
