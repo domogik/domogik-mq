@@ -56,9 +56,9 @@ class MQSyncSub():
         self.s_recv.connect(sub_addr)
 
         for category_filter in category_filters:
-            self.s_recv.setsockopt(zmq.SUBSCRIBE, category_filter)
+            self.s_recv.setsockopt_string(zmq.SUBSCRIBE, u"{0}".format(category_filter))
         if len(category_filters) == 0:
-            self.s_recv.setsockopt(zmq.SUBSCRIBE, '')
+            self.s_recv.setsockopt(zmq.SUBSCRIBE, u'')
     
     def __del__(self):
         # Not sure this is really mandatory
@@ -91,10 +91,10 @@ class MQAsyncSub():
         self.s_recv.connect(sub_addr)
 
         if len(category_filters) == 0:
-            self.s_recv.setsockopt_string(zmq.SUBSCRIBE, '')
+            self.s_recv.setsockopt_string(zmq.SUBSCRIBE, u'')
         else:
             for category_filter in category_filters:
-                self.s_recv.setsockopt_string(zmq.SUBSCRIBE, category_filter)
+                self.s_recv.setsockopt_string(zmq.SUBSCRIBE, u"{0}".format(category_filter))
         ioloop = IOLoop.instance()
         self.stream_asyncmq = ZMQStream(self.s_recv, ioloop)
         self.stream_asyncmq.on_recv(self._on_message)
