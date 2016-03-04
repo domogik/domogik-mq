@@ -253,9 +253,12 @@ class MqAsyncReq(object):
             # disable timout
             self._tmo.stop()
             self._tmo = None
+        tmp = []
+        for m in msg:
+            tmp.append(m.decode())
         # setting state before invoking on_message, so we can request from there
         self.can_send = True
-        self.on_message(msg)
+        self.on_message(tmp)
         return
 
     def on_message(self, msg):

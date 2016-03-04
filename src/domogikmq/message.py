@@ -50,7 +50,7 @@ class MQMessage():
         """ getAction
             returns the current action
         """
-        return self._action
+        return self._action.decode()
 
     def get_data(self):
         """ getData
@@ -63,8 +63,8 @@ class MQMessage():
             returns a compiled list
         """
         stack = []
-        stack.append( self._action )
-        stack.append( json.dumps(self._data) )
+        stack.append( self._action.encode() )
+        stack.append( json.dumps(self._data).encode() )
         return stack
 
     def set(self, stack):
