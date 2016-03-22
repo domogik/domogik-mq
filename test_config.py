@@ -148,6 +148,13 @@ def _check_port_availability(s_ip, s_port, udp = False):
         if d_port == port:
             assert d_ip != ip and ip != "00000000", "A service already listen on ip %s and port %s. Stop it and restart test_config.py" % (s_ip, s_port)
 
+def _check_port_open(ip, s_port):
+    import socket
+    port = int(s_port)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    result = sock.connect_ex((ip,port))
+    assert result == 0, "Can not connect to {0} on port {1}".format(ip, port)
+
 def test_user_config_file(user_home, user_entry, is_master=True):
     info("Check user config file contents")
     import ConfigParser
@@ -181,6 +188,9 @@ def test_user_config_file(user_home, user_entry, is_master=True):
         _check_port_availability(mq_ip, mq['sub_port'])
         ok("IPs/ports needed by Domogik MQ are not bound by anything else")
     else:
+        _check_port_open(mq_ip, mq['req_rep_port'])
+        _check_port_open(mq_ip, mq['pub_port'])
+        _check_port_open(mq_ip, mq['sub_port'])
         ok("Connection to IPs/ports needed by Domogik MQ client where sucessfull")
 
     ok("[mq] section seems good")

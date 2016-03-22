@@ -366,7 +366,10 @@ def install():
         ok("Installation finished")
 
         if not args.test:
-            os.system('python test_config.py')
+            if master:
+                os.system('python test_config.py')
+            else:
+                os.system('python test_config.py --client')
         print("\n\n")
     except:
         import traceback
