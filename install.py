@@ -158,20 +158,26 @@ def create_user(d_user, d_shell = "/bin/sh"):
         ok("Correctly created domogik-mq user")
     # return the user to use
 
-def is_domogik_advanced(advanced_mode, sect, key):
+def is_domogik_advanced(advanced_mode, master, sect, key):
     advanced_keys = {
-        'mq': ['log_dir_path', 'pid_dir_path', 'log_level', 'req_rep_port', 'pub_port', 'sub_port', 'install_type'],
+        'mq': ['log_dir_path', 'pid_dir_path', 'log_level', 'install_type'],
+    }
+    client_keys = {
+        'mq': [ 'req_rep_port', 'pub_port', 'sub_port' ],
     }
     if advanced_mode:
         return True
     else:
-        if sect not in advanced_keys:
+        if sect not in advanced_keys and sect not in client_keys:
             return True
         else:
-            if key not in advanced_keys[sect]:
+            if key not in advanced_keys[sect] and key not in client_keys[sect]:
                 return True
             else:
-                return False
+                if not master and key in client_keys[sect]:
+                    return True
+                else:
+                    return False
 
 def write_domogik_configfile(advanced_mode, master, intf_ip):
     # read the sample config file
@@ -184,10 +190,10 @@ def write_domogik_configfile(advanced_mode, master, intf_ip):
         for item in config.items(sect):
             if item[0] == 'is_master':
                 config.set(sect, 'is_master', master)
-            elif item[0] in itf  and not advanced_mode:
+            elif item[0] in itf and not advanced_mode and  master:
                 config.set(sect, item[0], intf_ip)
                 debug("Value {0} in domogik-mq.cfg set to {1}".format(item[0], intf_ip))
-            elif is_domogik_advanced(advanced_mode, sect, item[0]):
+            elif is_domogik_advanced(advanced_mode, master, sect, item[0]):
                 print("- {0} [{1}]: ".format(item[0], item[1])),
                 new_value = sys.stdin.readline().rstrip('\n')
                 if new_value != item[1] and new_value != '':
@@ -356,7 +362,6 @@ def install():
         if args.command_line:
             info("Update the config file : /etc/domogik/domogik-mq.cfg")
             write_domogik_configfile_from_command_line(args, master)
-
         else:
             if not args.config and needupdate():
                 # select the correct interface
