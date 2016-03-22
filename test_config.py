@@ -84,7 +84,7 @@ def test_imports():
     assert good, "One or more import have failed, please install required packages and restart this script."
     ok("Imports are good")
 
-def test_config_files():
+def test_config_files(is_master):
     global user
     info("Test global config file to get the user")
     assert os.path.isfile("/etc/conf.d/domogik-mq") or os.path.isfile("/etc/default/domogik-mq"), \
@@ -121,7 +121,7 @@ def test_config_files():
     assert os.path.isfile("/etc/domogik/domogik-mq.cfg"), "The domogik config file /etc/domogik/domogik-mq.cfg does not exist. Please report this as a bug if you used install.sh." % user_home
     ok("Domogik MQ's user exists and has a config file")
 
-    test_user_config_file(user_home, user_entry)
+    test_user_config_file(user_home, user_entry, is_master)
 
 def _test_user_can_write(conn, path, user_entry):
     os.setgid(user_entry.pw_gid)
@@ -148,7 +148,7 @@ def _check_port_availability(s_ip, s_port, udp = False):
         if d_port == port:
             assert d_ip != ip and ip != "00000000", "A service already listen on ip %s and port %s. Stop it and restart test_config.py" % (s_ip, s_port)
 
-def test_user_config_file(user_home, user_entry):
+def test_user_config_file(user_home, user_entry, is_master=True):
     info("Check user config file contents")
     import ConfigParser
     config = ConfigParser.ConfigParser()
@@ -175,10 +175,13 @@ def test_user_config_file(user_home, user_entry):
     mq_ip = mq['ip']
     if mq_ip == '*':
         mq_ip = get_ip()
-    _check_port_availability(mq_ip, mq['req_rep_port'])
-    _check_port_availability(mq_ip, mq['pub_port'])
-    _check_port_availability(mq_ip, mq['sub_port'])
-    ok("IPs/ports needed by Domogik MQ are not bound by anything else")
+    if is_master:
+        _check_port_availability(mq_ip, mq['req_rep_port'])
+        _check_port_availability(mq_ip, mq['pub_port'])
+        _check_port_availability(mq_ip, mq['sub_port'])
+        ok("IPs/ports needed by Domogik MQ are not bound by anything else")
+    else:
+        ok("Connection to IPs/ports needed by Domogik MQ client where sucessfull")
 
     ok("[mq] section seems good")
 
@@ -189,13 +192,13 @@ def test_version():
     assert not (v[0] == 2 and v[1] < 7), "Python version is %s.%s, it must be >= 2.7, please upgrade" % (v[0], v[1])
     ok("Python version is >= 2.7")
 
-def test_config():
+def test_config(is_master=True):
     try:
         print("\n\n")
         info("Start to test configuration")
         am_i_root()
         test_imports()
-        test_config_files()
+        test_config_files(is_master)
         test_version()
         print("\n\n")
         ok("================================================== <==")
@@ -206,4 +209,7 @@ def test_config():
         fail(sys.exc_info()[1])
 
 if __name__ == "__main__":
-    test_config()
+    if len(sys.argv) == 2 and sys.argv[1] == "--client":
+        test_config(False)
+    else:
+        test_config(True)
