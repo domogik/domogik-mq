@@ -27,6 +27,7 @@ __email__ = 'gst-py@a-nugget.de'
 
 import zmq
 import sys
+
 from zmq.eventloop.zmqstream import ZMQStream
 from zmq.eventloop.ioloop import IOLoop, DelayedCallback
 from zmq import select
@@ -64,7 +65,7 @@ class MQSyncReq(object):
             config['ip'] = get_ip()
         endpoint = "tcp://{0}:{1}".format(config['ip'], config['req_rep_port'])
         self.socket = ZmqSocket(context, zmq.REQ)
-        self.socket.connect(endpoint)         
+        self.socket.connect(endpoint)
         return
 
     def shutdown(self):
@@ -95,7 +96,7 @@ class MQSyncReq(object):
             msg = [msg]
         elif type(msg) is str:
             msg = [str.encode(msg)]
-        to_send = [self._proto_version, str.encode(service)]
+        to_send = [self._proto_version, str.encode(service), str(timeout)]
         to_send.extend(msg)
         self.socket.send_multipart(to_send)
         ret = None
@@ -113,7 +114,7 @@ class MQSyncReq(object):
         :type msg:      list of str
         :param timeout: time to wait in milliseconds.
         :type timeout:  int
-        
+
         :rtype : message parts
         """
         ret = self.rawrequest( service, msg, timeout)
@@ -202,7 +203,7 @@ class MqAsyncReq(object):
         :type msg:      list of str
         :param timeout: time to wait in milliseconds.
         :type timeout:  int
-        
+
         :rtype None:
         """
         if not self.can_send:
