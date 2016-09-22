@@ -414,11 +414,14 @@ class MDPBroker(object):
         """
         service = msg.pop(0)
         try :
-            timeout = float(msg.pop(0))
+            tOut = msg.pop(0)
+            timeout = float(tOut)
         except :
-            self.log.warning("Client REQ received: to='{0}' with bad timeout format : data={1}".format(service, msg))
+            msg.insert(0, tOut)
             timeout = None
-        self.log.debug("Client REQ received: to='{0}' (timeout={1}s) data={2}".format(service, timeout, msg))
+            self.log.debug("Client REQ received: to='{0}' without timeout : data={1}".format(service, msg))
+        else :
+            self.log.debug("Client REQ received: to='{0}' (timeout={1}s) data={2}".format(service, timeout, msg))
         if service.startswith(b'mmi.'):
             self.on_mmi(rp, service, msg)
             return
