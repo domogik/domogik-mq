@@ -21,7 +21,7 @@ __license__ = """
 __author__ = 'Guido Goldstein'
 __email__ = 'gst-py@a-nugget.de'
 
-
+import time
 import zmq
 #import daemon
 from domogikmq.common.daemon import daemon
@@ -300,6 +300,7 @@ class MDPBroker(object):
             wq, wr = self._services[service]
             cp, msg = split_address(msg)
             self.client_response(cp, service, msg)
+            wrep.unlockhbeat()
             wq.put(wrep.id)
             if wr:
                 proto, rp, msg = wr.pop(0)
@@ -412,7 +413,15 @@ class MDPBroker(object):
         :rtype: None
         """
         service = msg.pop(0)
-        self.log.debug("Client REQ received: to='{0}' data={1}".format(service, msg))
+        try :
+            tOut = msg.pop(0)
+            timeout = float(tOut)
+        except :
+            msg.insert(0, tOut)
+            timeout = None
+            self.log.debug("Client REQ received: to='{0}' without timeout : data={1}".format(service, msg))
+        else :
+            self.log.debug("Client REQ received: to='{0}' (timeout={1}s) data={2}".format(service, timeout, msg))
         if service.startswith(b'mmi.'):
             self.on_mmi(rp, service, msg)
             return
@@ -426,6 +435,8 @@ class MDPBroker(object):
                 wr.append((proto, rp, msg))
                 return
             wrep = self._workers[wid]
+            if timeout is not None :
+                wrep.lockhbeat(timeout)
             to_send = [ wrep.id, b'', self.WORKER_PROTO, b'\x02']
             to_send.extend(rp)
             to_send.append(b'')
@@ -511,15 +522,39 @@ class WorkerRep(object):
     """
 
     def __init__(self, proto, wid, service, stream):
+        l = logger.Logger('mq_broker')
+        self.log = l.get_logger()
+
         self.proto = proto
         self.id = wid
         self.service = service
         self.curr_liveness = HB_LIVENESS
         self.stream = stream
         self.last_hb = 0
+        self._startLockHB = 0
+        self._timeOut = 0
         self.hb_out_timer = PeriodicCallback(self.send_hb, HB_INTERVAL)
         self.hb_out_timer.start()
         return
+
+    def lockhbeat(self, timeOut):
+        """Lock heartbeat process during timeout to preserve rep from client req
+        """
+        self.log.debug("WorkerRep {0} HBeat Locked for {1} s...".format(self.service, timeOut))
+        self._startLockHB = time.time()
+        self._timeOut = timeOut
+
+    def unlockhbeat(self):
+        """Unlock heartbeat process
+        """
+        self.log.debug("WorkerRep {0} HBeat Unlocked".format(self.service))
+        self._startLockHB = 0
+        self._timeOut = 0
+
+    def get_lockhbeat(self):
+        """Get ock heartbeat status
+        """
+        return self._startLockHB != 0
 
     def send_hb(self):
         """Called on every HB_INTERVAL.
@@ -528,9 +563,15 @@ class WorkerRep(object):
 
         Sends heartbeat to worker.
         """
-        self.curr_liveness -= 1
-        msg = [ self.id, b'', self.proto, b'\x04' ]
-        self.stream.send_multipart(msg)
+        if self.get_lockhbeat() :
+            if time.time() >= self._startLockHB + self._timeOut :
+                self.log.warning("WorkerRep {0} HBeat lock timeout {1} s".format(self.service, self._timeOut))
+                self.log.debug(u"{0}, {1}".format(self._startLockHB + self._timeOut,  time.time()))
+                self.unlockhbeat()
+        if not self.get_lockhbeat() :
+            self.curr_liveness -= 1
+            msg = [ self.id, b'', self.proto, b'\x04' ]
+            self.stream.send_multipart(msg)
         return
 
     def on_heartbeat(self):
