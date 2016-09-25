@@ -37,8 +37,8 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-
 import logging
+from logging.handlers import TimedRotatingFileHandler
 import sys
 from domogikmq.configloader import Loader
 
@@ -86,7 +86,8 @@ class Logger():
             # log to file
             my_logger.propagate = 0
             if not my_logger.handlers:
-                hdlr = logging.FileHandler(filename)
+                hdlr = TimedRotatingFileHandler(filename, \
+                        when='D', interval=1, backupCount=10)
                 formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
                 hdlr.setFormatter(formatter)
                 my_logger.addHandler(hdlr)
