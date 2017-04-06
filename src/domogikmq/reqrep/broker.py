@@ -448,6 +448,8 @@ class MDPBroker(object):
             msg = "broker has no service {0}".format(service)
             print(msg)
             self.log.warning(msg)
+        except:
+            self.log.error("Error while received Client REQ : to='{0}', trace={1}".format(service, traceback.format_exc()))
         return
 
     def on_worker(self, proto, rp, msg):
@@ -550,6 +552,7 @@ class WorkerRep(object):
         self.log.debug("WorkerRep {0} HBeat Unlocked".format(self.service))
         self._startLockHB = 0
         self._timeOut = 0
+        self.on_heartbeat()
 
     def get_lockhbeat(self):
         """Get ock heartbeat status
