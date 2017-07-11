@@ -6,6 +6,7 @@
 """
 
 import json
+from collections import OrderedDict
 
 class MQMessage():
     """MQMessage
@@ -72,7 +73,7 @@ class MQMessage():
             input a message list and decompile
         """
         self._action = stack.pop(0)
-        self._data = json.loads(stack.pop(0).decode())
+        self._data = json.loads(stack.pop(0).decode(), object_pairs_hook=OrderedDict)
 
     def __repr__(self):
         """Return an internal representation of the class"""
