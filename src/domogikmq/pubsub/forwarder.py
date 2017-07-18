@@ -98,6 +98,8 @@ def main():
         log.error(exp)
         log.error("Bringing down ZMQ device")
         raise Exception("Error with forwarder device : {0}".format(traceback.format_exc()))
+    except:
+        log.error(u"Error : {0}".format(traceback.format_exc()))
     finally:
         if frontend != None:
             frontend.close()
