@@ -53,11 +53,8 @@ setup(
     description = 'MQ module for Domogik',
     author = 'Domogik team',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
-    install_requires=['setuptools',
-          'pip >= 1.0',
-          'netifaces',
-          'simplejson >= 1.9.2',
-          'pyzmq >= 14.4.0'],
+    install_requires=['setuptools'
+          ],
     zip_safe = False,
     license = 'GPL v3',
     packages = find_packages('src', exclude=["mpris"]),
