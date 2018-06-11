@@ -80,6 +80,7 @@ class MQRep(object):
         self.need_handshake = True
         self.ticker = None
         self._delayed_cb = None
+        self.envelope = None
         self._create_stream()
 
         ### patch fritz
@@ -123,7 +124,7 @@ class MQRep(object):
         """Method called every HB_INTERVAL milliseconds.
         """
         if DEBUG:
-            print("MQREP > _tick")
+            print("MQREP > _tick {0}".format(self.service))
         self.curr_liveness -= 1
         if DEBUG:
             print('MQREP > _tick - {0} tick = {1}'.format(time.time(), self.curr_liveness))
@@ -178,7 +179,10 @@ class MQRep(object):
             to_send.extend(msg)
         else:
             to_send.append(msg)
+        if DEBUG:
+            print("MQRep > Reply to {0} at {1} - {2}".format(self.service, time.strftime("%H:%M:%S"), to_send))
         self.stream.send_multipart(to_send)
+        self.curr_liveness = self.HB_LIVENESS
         return
 
     def _on_mpd_message(self, msg):
@@ -187,7 +191,7 @@ class MQRep(object):
         msg is a list w/ the message parts
         """
         if DEBUG:
-            print("MQRep > _on_mpd_message : {0} - {1}".format(time.strftime("%H:%M:%S"), msg))
+            print("MQRep > _on_mpd_message from {0} : {1} - {2}".format(self.service, time.strftime("%H:%M:%S"), msg))
         # 1st part is empty
         msg.pop(0)
         # 2nd part is protocol version
@@ -206,8 +210,10 @@ class MQRep(object):
                 print("MQREP > _on_mpd_message > type x05 : disconnect")
             self.curr_liveness = 0 # reconnect will be triggered by hb timer
         elif msg_type == b'\x02': # request
-            if DEBUG:
-                print("MQREP > _on_mpd_message > type x02 : request")
+            if DEBUG :
+                print("MQREP > _on_mpd_message > type x02 : request from {0}".format(self.service))
+                if self.envelope is not None :
+                    print("MQREP > _on_mpd_message > request conflict : pending reply for {0}".format(self.envelope))
             # remaining parts are the user message
             envelope, msg = split_address(msg)
             envelope.append(b'')
@@ -218,6 +224,7 @@ class MQRep(object):
             #print("MQRep > before self.on_mdp_request")
             #print(self.on_mdp_request)
             #print(mes)
+            self.curr_liveness = self.HB_LIVENESS * 4 # Increase liveness for long reply ( 12 s)
             try:
                 self.on_mdp_request(mes)
             except:
