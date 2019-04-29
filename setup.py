@@ -41,8 +41,9 @@ from setuptools import setup, find_packages
 
 pyzmq_found = False
 
-import pip
-for mod in pip.get_installed_distributions():
+import pkg_resources
+dists = [d for d in pkg_resources.working_set]
+for mod in dists:
     if ( mod.key == 'pyzmq' ):
         pyzmq_found = True
 
