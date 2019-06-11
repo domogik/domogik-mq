@@ -1,9 +1,9 @@
-#!/bin/bash 
+#!/bin/bash
 
 # INFORMATIONS
 # ============
 #
-# * mysql-server is not installed by the install.py script as the database must 
+# * mysql-server is not installed by the install.py script as the database must
 #   be created before launching the install.py script
 
 # Make sure only root can run our script
@@ -37,29 +37,29 @@ function continue() {
 pkg_list="\
          git \
          gcc\
-         libzmq-dev \
+         libzmq3-dev \
          \
-         python \
-         python-dev \
-         python-pkg-resources \
-         python-setuptools \
-         python-pip \
-         python-zmq \
-         python-netifaces \
+         python3 \
+         python3-dev \
+         python3-pkg-resources \
+         python3-setuptools \
+         python3-pip \
+         python3-zmq \
+         python3-netifaces \
          "
 
 apt-get update
-continue $? 
-    
+continue $?
+
 apt-get install $pkg_list
-continue $? 
+continue $?
 
 pip_list=" "
 
 for elt in $pip_list
   do
-    pip install $elt
-    continue $? 
+    pip3 install $elt
+    continue $?
 done
 
 

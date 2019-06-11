@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -157,8 +157,8 @@ def _check_port_open(ip, s_port):
 
 def test_user_config_file(user_home, user_entry, is_master=True):
     info("Check user config file contents")
-    import ConfigParser
-    config = ConfigParser.ConfigParser()
+    import configparser
+    config = configparser.ConfigParser()
     config.read("/etc/domogik/domogik-mq.cfg")
 
     #check [mq] section

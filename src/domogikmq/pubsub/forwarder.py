@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -55,7 +55,7 @@ def main():
     frontend = None
     backend = None
     context = None
-    
+
     try:
         context = zmq.Context(1)
 
@@ -70,7 +70,7 @@ def main():
         frontend.bind(sub_addr)
         # We want to get all messages from emitters
         #frontend.setsockopt(zmq.SUBSCRIBE, "")
-        
+
         # Socket facing receivers
         backend = context.socket(zmq.XPUB)
         # Forwarder publishes to the receiver *sub* port
@@ -78,7 +78,7 @@ def main():
                    config['ip'], config['sub_port'])
         log.info("Sending messages to {0} [BIND]".format(pub_addr))
         backend.bind(pub_addr)
-        
+
         log.info("Forwarding messages...")
         #zmq.device(zmq.FORWARDER, frontend, backend)
         poller = zmq.Poller()

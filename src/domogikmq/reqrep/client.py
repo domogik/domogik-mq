@@ -90,13 +90,17 @@ class MQSyncReq(object):
         if type(msg) is list:
             b = []
             for m in msg:
-                b.append(str.encode(m))
+                # already in unicode
+                if isinstance(m, bytes):
+                    b.append(m)
+                else:
+                    b.append(bytes(m, 'utf-8'))
             msg = b
         elif type(msg) is bytes:
             msg = [msg]
         elif type(msg) is str:
-            msg = [str.encode(msg)]
-        to_send = [self._proto_version, str.encode(service), str(timeout)]
+            msg = [bytes(msg, 'utf-8')]
+        to_send = [self._proto_version, str.encode(service), bytes(str(timeout), 'utf-8')]
         to_send.extend(msg)
         self.socket.send_multipart(to_send)
         ret = None

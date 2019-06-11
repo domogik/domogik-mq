@@ -1,5 +1,5 @@
 [console_scripts]
-dmg_mq_dump = domogikmq.dump:main
 dmg_broker = domogikmq.reqrep.broker:main
 dmg_forwarder = domogikmq.pubsub.forwarder:main
+dmg_mq_dump = domogikmq.dump:main
 

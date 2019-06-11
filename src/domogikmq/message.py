@@ -1,5 +1,5 @@
 """MQMessage
-   
+
    handler class to handle a reqrep message
 
    this wrapper is written to easely extend the message type later on,
@@ -21,7 +21,7 @@ class MQMessage():
             can set action and data field
         """
         if action:
-            self._action = action
+            self._action = self.set_action(action)
         else:
             self._action = None
         if data:
@@ -33,7 +33,7 @@ class MQMessage():
         """ setAction
             sets the action field
         """
-        self._action = action
+        self._action = bytes(action, 'utf-8') if isinstance(action, str) else action
 
     def set_data(self, data):
         """ set_data
@@ -64,7 +64,7 @@ class MQMessage():
             returns a compiled list
         """
         stack = []
-        stack.append( self._action.encode() )
+        stack.append( self._action )
         stack.append( json.dumps(self._data).encode() )
         return stack
 

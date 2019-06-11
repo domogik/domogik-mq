@@ -9,6 +9,13 @@ import traceback
 
 MSG_VERSION = "0_1"
 
+def convert(data):
+    if isinstance(data, bytes):  return data.decode()
+    if isinstance(data, dict):   return dict(map(convert, data.items()))
+    if isinstance(data, tuple):  return tuple(map(convert, data))
+    if isinstance(data, list):   return list(map(convert, data))
+    return data
+
 class MQPub():
     def __init__(self, context, caller_id):
         print("MQPub > __init__")
@@ -53,7 +60,7 @@ class MQPub():
         try:
             print("MQPub > send_event category='{0}'".format(category))
             msg_id = "{0}.{1}.{2}".format(category, str(time()).replace('.','_'), MSG_VERSION)
-            self.s_send.send_multipart([str.encode(msg_id),str.encode(json.dumps(content)) ] )
+            self.s_send.send_multipart([str(msg_id).encode(), json.dumps(convert(content)).encode()])
         except:
             print(u"MQPub > send_event > ERROR : {0}".format(traceback.format_exc()))
         #self.s_send.send( json.dumps(content) )

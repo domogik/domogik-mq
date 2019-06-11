@@ -1,16 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
 import pwd
 import sys
 import platform
-try:
-    # from python3 onwards
-    import configparser
-except ImportError:
-    # python 2
-    import ConfigParser as configparser
+import configparser
 import argparse
 import shutil
 import logging
@@ -300,8 +295,8 @@ def install():
     args = parser.parse_args()
     try:
         # CHECK python version
-        if sys.version_info < (2, 6):
-            print("Python version is to low, at least python 2.6 is needed")
+        if sys.version_info < (3, 6):
+            print("Python version is to low, at least python 3.6 is needed")
             exit(0)
 
         # CHECK sources not in / or /root
@@ -311,7 +306,7 @@ def install():
 
         if args.dist_packages:
             dist_packages_install_script = ''
-            #platform.dist() and platform.linux_distribution() 
+            #platform.dist() and platform.linux_distribution()
             #doesn't works with ubuntu/debian, both say debian.
             #So I not found pettiest test :(
             if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
@@ -328,7 +323,7 @@ def install():
         # RUN setup.py
         if not args.setup:
             info("Run setup.py")
-            if os.system('python setup.py develop') !=  0:
+            if os.system('python3 setup.py develop') !=  0:
                 raise OSError("setup.py doesn't finish correctly")
 
         # ask for the domogik user
@@ -372,9 +367,9 @@ def install():
 
         if not args.test:
             if master:
-                os.system('python test_config.py')
+                os.system('python3 test_config.py')
             else:
-                os.system('python test_config.py --client')
+                os.system('python3 test_config.py --client')
         print("\n\n")
     except:
         import traceback

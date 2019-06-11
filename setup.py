@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -29,7 +29,7 @@ Implements
 
 
 @author: Domogik project
-@copyright: (C) 2007-2012 Domogik project
+@copyright: (C) 2007-2019 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -49,7 +49,7 @@ for mod in dists:
 
 setup(
     name = 'Domogik MQ',
-    version = '1.3',
+    version = '1.4',
     url = 'http://www.domogik.org/',
     description = 'MQ module for Domogik',
     author = 'Domogik team',

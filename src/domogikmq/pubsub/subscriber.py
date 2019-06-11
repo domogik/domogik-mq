@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -59,11 +59,11 @@ class MQSyncSub():
             self.s_recv.setsockopt_string(zmq.SUBSCRIBE, u"{0}".format(category_filter))
         if len(category_filters) == 0:
             self.s_recv.setsockopt(zmq.SUBSCRIBE, u'')
-    
+
     def __del__(self):
         # Not sure this is really mandatory
         self.s_recv.close()
-    
+
     def wait_for_event(self):
         """Receive an event
 
@@ -98,15 +98,15 @@ class MQAsyncSub():
         ioloop = IOLoop.instance()
         self.stream_asyncmq = ZMQStream(self.s_recv, ioloop)
         self.stream_asyncmq.on_recv(self._on_message)
-    
+
     def __del__(self):
         # Not sure this is really mandatory
         self.s_recv.close()
-    
+
     def _on_message(self, msg):
         """Received an event
         will lookup the correct callback to use, and call it
-        
+
         :param: msg = the message received
         """
         if len(msg) < 2:
@@ -128,7 +128,7 @@ class MQAsyncSub():
             self.on_message(mid, jsons)
         except ValueError as e:
             pass
-  
+
     def on_message(self, msg_id, content):
         """Public method called when a message arrived.
 

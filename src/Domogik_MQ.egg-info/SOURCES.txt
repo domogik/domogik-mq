@@ -1,3 +1,4 @@
+README.md
 setup.py
 src/Domogik_MQ.egg-info/PKG-INFO
 src/Domogik_MQ.egg-info/SOURCES.txt
@@ -7,16 +8,17 @@ src/Domogik_MQ.egg-info/not-zip-safe
 src/Domogik_MQ.egg-info/requires.txt
 src/Domogik_MQ.egg-info/top_level.txt
 src/domogikmq/__init__.py
-src/domogikmq/common.py
 src/domogikmq/configloader.py
 src/domogikmq/dump.py
 src/domogikmq/logger.py
 src/domogikmq/message.py
 src/domogikmq/socket.py
-src/domogikmq/daemon/__init__.py
-src/domogikmq/daemon/daemon.py
-src/domogikmq/daemon/pidlockfile.py
-src/domogikmq/daemon/runner.py
+src/domogikmq/common/__init__.py
+src/domogikmq/common/utils.py
+src/domogikmq/common/daemon/__init__.py
+src/domogikmq/common/daemon/daemon.py
+src/domogikmq/common/daemon/pidlockfile.py
+src/domogikmq/common/daemon/runner.py
 src/domogikmq/pubsub/__init__.py
 src/domogikmq/pubsub/forwarder.py
 src/domogikmq/pubsub/publisher.py

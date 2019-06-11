@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -39,13 +39,8 @@ Implements
 #       DON'T CHANGE ANYTHING AFTER THIS LINE      #
 ####################################################
 import os
-import pwd 
-try:
-    # from python3 onwards
-    import configparser
-except ImportError:
-    # python 2
-    import ConfigParser as configparser
+import pwd
+import configparser
 import threading
 import time
 import fcntl
@@ -58,7 +53,7 @@ class Loader():
     Parse Domogik MQ config files
     '''
 
-    config = None 
+    config = None
 
     def __init__(self, part_name=None):
         '''
