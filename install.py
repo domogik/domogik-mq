@@ -295,8 +295,8 @@ def install():
     args = parser.parse_args()
     try:
         # CHECK python version
-        if sys.version_info < (3, 6):
-            print("Python version is to low, at least python 3.6 is needed")
+        if sys.version_info < (3, 5):
+            print("Python version is to low, at least python 3.5 is needed")
             exit(0)
 
         # CHECK sources not in / or /root
