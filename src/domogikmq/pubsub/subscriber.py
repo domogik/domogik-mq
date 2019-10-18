@@ -36,7 +36,6 @@ Implements
 
 import json
 import zmq
-import sys
 from zmq.eventloop.zmqstream import ZMQStream
 from zmq.eventloop.ioloop import IOLoop
 from domogikmq.configloader import Loader
@@ -80,7 +79,7 @@ class MQSyncSub():
             raise Exception(msg_error)
 
 class MQAsyncSub():
-    def __init__(self, context, caller_id, category_filters):
+    def __init__(self, context, caller_id, category_filters, IOloop_inst=None):
         cfg = Loader('mq').load()
         self.cfg_mq = dict(cfg[1])
         if self.cfg_mq['ip'].strip() == "*":
@@ -95,7 +94,7 @@ class MQAsyncSub():
         else:
             for category_filter in category_filters:
                 self.s_recv.setsockopt_string(zmq.SUBSCRIBE, u"{0}".format(category_filter))
-        ioloop = IOLoop.instance()
+        ioloop = IOloop_inst or IOLoop.instance()
         self.stream_asyncmq = ZMQStream(self.s_recv, ioloop)
         self.stream_asyncmq.on_recv(self._on_message)
 
